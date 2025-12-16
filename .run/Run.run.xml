@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Run App" type="MicronautRunConfigurationType" factoryName="Micronaut">
+  <configuration default="false" name="Run" type="MicronautRunConfigurationType" factoryName="Micronaut">
     <option name="MAIN_CLASS_NAME" value="one.microstream.demo.Application" />
     <module name="books-rest-server" />
     <option name="VM_PARAMETERS" value="--add-exports java.base/jdk.internal.misc=ALL-UNNAMED --add-modules jdk.incubator.vector" />

@@ -2,8 +2,7 @@ package one.microstream.demo.controller;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.stream.Streams;
+import java.util.stream.Stream;
 
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.convert.format.Format;
@@ -162,7 +161,7 @@ public class BookController
     )
     {
         // @Format("csv") doesn't seem to work for single values so we split ourselves
-        final Set<String> genresSet = Streams.of(genres.split(","))
+        final Set<String> genresSet = Stream.of(genres.split(","))
             .filter(s -> !s.isBlank())
             .collect(Collectors.toUnmodifiableSet());
         return this.books.searchByGenre(genresSet);
