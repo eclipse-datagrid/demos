@@ -13,6 +13,7 @@ import one.microstream.demo.exception.InvalidGenreException;
 import one.microstream.demo.repository.AuthorRepository;
 import one.microstream.demo.repository.BookRepository;
 import one.microstream.demo.repository.GenreRepository;
+import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterFoundation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +25,11 @@ import java.util.*;
 
 @Singleton
 @Requires(property = "app.data.generation.enabled", value = "true")
-public class FakeDataGenerator
+public class DataGenerator
 {
-    private static final Logger LOG = LoggerFactory.getLogger(FakeDataGenerator.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DataGenerator.class);
+
+    private final ClusterFoundation<?> foundation;
 
     private final GenreRepository genres;
     private final AuthorRepository authors;
@@ -35,7 +38,8 @@ public class FakeDataGenerator
     private final DataGenerationConfig authorConf;
     private final DataGenerationConfig bookConf;
 
-    public FakeDataGenerator(
+    public DataGenerator(
+        ClusterFoundation<?> foundation,
         GenreRepository genres,
         AuthorRepository authors,
         BookRepository books,
@@ -44,6 +48,7 @@ public class FakeDataGenerator
         @Named("book") DataGenerationConfig bookConf
     )
     {
+        this.foundation = foundation;
         this.genres = genres;
         this.authors = authors;
         this.books = books;
@@ -53,7 +58,18 @@ public class FakeDataGenerator
     }
 
     @EventListener
-    public void generateData(StartupEvent event)
+    public void generateDataAtStartup(StartupEvent event)
+    {
+        // don't generate if we are in a cluster as only the writer is allowed
+        // to modify the storage, so this has to be called manually in that case
+        final var props = foundation.getNodelibraryPropertiesProvider();
+        if (!props.isProdMode())
+        {
+            this.generateData();
+        }
+    }
+
+    public void generateData()
     {
         generateGenres();
         final var authorIds = generateAuthors();
