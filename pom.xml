@@ -190,7 +190,7 @@
                 <groupId>io.micronaut.maven</groupId>
                 <artifactId>micronaut-maven-plugin</artifactId>
                 <configuration>
-                    <jvmArguments>--add-exports java.base/jdk.internal.misc=ALL-UNNAMED</jvmArguments>
+                    <jvmArguments>--add-exports java.base/jdk.internal.misc=ALL-UNNAMED --add-modules jdk.incubator.vector</jvmArguments>
                 </configuration>
             </plugin>
 

@@ -9,8 +9,7 @@ import java.util.UUID;
  * @param id              the unique identifier
  * @param isbn            the isbn identifier
  * @param title           the title of the book
- * @param description     the description of the book which can usually be found
- *                        on the back
+ * @param description     the description of the book which can usually be found on the back
  * @param pages           how many pages the book has
  * @param genres          the genres of the book
  * @param publicationDate when the book was published
@@ -55,10 +54,13 @@ public record Book(
             return false;
         }
         // use author id to avoid stack overflows
-        return Objects.equals(this.author.id(), other.author.id()) && Objects.equals(
-            this.description,
-            other.description
-        )
+        boolean authorsEqual = this.author == null
+            && other.author == null
+            || this.author != null
+            && other.author != null
+            && this.author.id().equals(other.author.id());
+        return authorsEqual
+            && Objects.equals(this.description, other.description)
             && Objects.equals(this.genres, other.genres)
             && Objects.equals(this.id, other.id)
             && Objects.equals(this.isbn, other.isbn)
