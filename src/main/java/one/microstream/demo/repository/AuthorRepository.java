@@ -1,18 +1,7 @@
 package one.microstream.demo.repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
-import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterLockScope;
-import org.eclipse.serializer.concurrency.LockedExecutor;
-import org.eclipse.serializer.reference.Lazy;
-import org.eclipse.store.gigamap.types.GigaMap;
-
 import io.micronaut.eclipsestore.RootProvider;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import one.microstream.demo.domain.Author;
 import one.microstream.demo.domain.Book;
@@ -27,6 +16,13 @@ import one.microstream.demo.exception.InvalidIsbnException;
 import one.microstream.demo.exception.MissingAuthorException;
 import one.microstream.demo.gigamap.GigaMapAuthorIndices;
 import one.microstream.demo.gigamap.GigaMapBookIndices;
+import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterLockScope;
+import org.eclipse.serializer.concurrency.LockedExecutor;
+import org.eclipse.serializer.reference.Lazy;
+import org.eclipse.store.gigamap.lucene.LuceneIndex;
+import org.eclipse.store.gigamap.types.GigaMap;
+
+import java.util.*;
 
 /**
  * Repository for finding and modifying authors. All methods hold a cluster-wide
@@ -41,6 +37,10 @@ import one.microstream.demo.gigamap.GigaMapBookIndices;
 public class AuthorRepository extends ClusterLockScope
 {
     private static final int DEFAULT_PAGE_SIZE = 512;
+
+    // eager load lucene to avoid GigaMap not storing the index when inserting authors with books
+    @Inject
+    LuceneIndex<Book> luceneIndex;
 
     private final GigaMap<Author> authors;
     private final GigaMap<Book> books;

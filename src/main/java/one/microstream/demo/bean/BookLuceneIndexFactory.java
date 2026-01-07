@@ -1,15 +1,14 @@
 package one.microstream.demo.bean;
 
-import org.eclipse.store.gigamap.lucene.LuceneContext;
-import org.eclipse.store.gigamap.lucene.LuceneIndex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.micronaut.context.annotation.Factory;
 import io.micronaut.eclipsestore.RootProvider;
 import jakarta.inject.Singleton;
 import one.microstream.demo.domain.Book;
 import one.microstream.demo.domain.DataRoot;
+import org.eclipse.store.gigamap.lucene.LuceneContext;
+import org.eclipse.store.gigamap.lucene.LuceneIndex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Factory
 public class BookLuceneIndexFactory
