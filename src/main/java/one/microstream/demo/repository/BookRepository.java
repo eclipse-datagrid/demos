@@ -1,14 +1,15 @@
 package one.microstream.demo.repository;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
+import io.micronaut.eclipsestore.RootProvider;
+import jakarta.inject.Singleton;
+import one.microstream.demo.domain.Author;
+import one.microstream.demo.domain.Book;
+import one.microstream.demo.domain.DataRoot;
+import one.microstream.demo.dto.*;
+import one.microstream.demo.exception.*;
+import one.microstream.demo.gigamap.GigaMapAuthorIndices;
+import one.microstream.demo.gigamap.GigaMapBookIndices;
+import one.microstream.demo.lucene.BookDocumentPopulator;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -20,25 +21,7 @@ import org.eclipse.store.gigamap.lucene.LuceneIndex;
 import org.eclipse.store.gigamap.types.GigaMap;
 import org.eclipse.store.storage.types.StorageManager;
 
-import io.micronaut.eclipsestore.RootProvider;
-import jakarta.inject.Singleton;
-import one.microstream.demo.domain.Author;
-import one.microstream.demo.domain.Book;
-import one.microstream.demo.domain.DataRoot;
-import one.microstream.demo.dto.GetBookById;
-import one.microstream.demo.dto.InsertBook;
-import one.microstream.demo.dto.SearchBookByAuthor;
-import one.microstream.demo.dto.SearchBookByGenre;
-import one.microstream.demo.dto.SearchBookByTitle;
-import one.microstream.demo.dto.UpdateBook;
-import one.microstream.demo.exception.InvalidAuthorException;
-import one.microstream.demo.exception.InvalidGenreException;
-import one.microstream.demo.exception.InvalidIsbnException;
-import one.microstream.demo.exception.MissingAuthorException;
-import one.microstream.demo.exception.MissingBookException;
-import one.microstream.demo.gigamap.GigaMapAuthorIndices;
-import one.microstream.demo.gigamap.GigaMapBookIndices;
-import one.microstream.demo.lucene.BookDocumentPopulator;
+import java.util.*;
 
 /**
  * Repository for finding and modifying books. All methods hold a cluster-wide
@@ -140,8 +123,8 @@ public class BookRepository extends ClusterLockScope
                 returnDtos.add(GetBookById.from(book));
             }
 
-            // only store the changed book lists
-            this.storageManager.storeAll(cachedAuthors.values().stream().map(Author::books).toList());
+            // only store the changed author book lists
+            this.storageManager.storeAll(cachedAuthors.values().stream().map(a -> a.books().get()).toList());
         });
 
         return Collections.unmodifiableList(returnDtos);
