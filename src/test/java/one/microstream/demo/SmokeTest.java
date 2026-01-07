@@ -77,7 +77,7 @@ public class SmokeTest implements TestPropertyProvider
         actualGenres = client.retrieve(HttpRequest.GET("/genre"), Argument.listOf(String.class));
         assertIterableEquals(List.of("action"), actualGenres);
 
-        // insert author 0, author 1, author 2
+        // insert author0...3
         LOG.info("Inserting 4 authors");
         var authorsToInsert = new ArrayList<>(TestUtils.generateInsertAuthorNoBooksList(3));
         authorsToInsert.add(new InsertAuthor(
@@ -107,6 +107,11 @@ public class SmokeTest implements TestPropertyProvider
             Argument.listOf(GetAuthorById.class)
         );
         assertEquals(4, authors.size());
+        List<SearchBookByTitle> booksAfterAuthorInsert = client.retrieve(
+            HttpRequest.GET("/book/author/" + authors.get(3).id()),
+            Argument.listOf(SearchBookByTitle.class)
+        );
+        assertEquals(2, booksAfterAuthorInsert.size());
 
         // update author 1
         LOG.info("Updating author 1");
@@ -115,10 +120,10 @@ public class SmokeTest implements TestPropertyProvider
             "/author/" + author1.id(),
             new UpdateAuthor("UpdatedAuthor", "I am the updated author!")
         ));
-        var expectedAuthor0 =
+        var expectedAuthor1 =
             new GetAuthorById(author1.id(), "UpdatedAuthor", "I am the updated author!", Set.of());
-        var actualAuthor0 = client.retrieve("/author/id/" + author1.id(), GetAuthorById.class);
-        assertEquals(expectedAuthor0, actualAuthor0);
+        var actualAuthor1 = client.retrieve("/author/id/" + author1.id(), GetAuthorById.class);
+        assertEquals(expectedAuthor1, actualAuthor1);
 
         // delete author 2
         LOG.info("Deleting author 2");
@@ -148,7 +153,7 @@ public class SmokeTest implements TestPropertyProvider
                 author1.id()
             ),
             new InsertBook(
-                "Book5Isbn",
+                "Booky5Isbn",
                 "Book5Title",
                 "Book5Description",
                 3,
@@ -157,28 +162,73 @@ public class SmokeTest implements TestPropertyProvider
                 author1.id()
             )
         );
-        List<GetBookById> books = client.retrieve(
+
+        List<GetBookById> directInsertedBooks = client.retrieve(
             HttpRequest.POST("/book", booksToInsert),
             Argument.listOf(GetBookById.class)
         );
-        assertEquals(5, books.size());
+        assertEquals(3, directInsertedBooks.size());
+        List<SearchBookByTitle> allBooksAfterInsert = client.retrieve(
+            HttpRequest.GET("/book/title?search=b"),
+            Argument.listOf(SearchBookByTitle.class)
+        );
+        assertEquals(5, allBooksAfterInsert.size());
 
+        LOG.info("Updating book 1 and 4");
         // update book 1
-        LOG.info("Updating book 2 and 4");
-        var book2 = books.get(2);
+        var book1 = allBooksAfterInsert.get(1);
         client.exchange(HttpRequest.PUT(
-            "/book/" + book2.id(),
-            new UpdateBook("UpdatedBook", "I am the updated book!", "I am very updated!", 20, )
+            "/book/" + book1.id(),
+            new UpdateBook(
+                "UpdatedBook",
+                "I am the updated book!",
+                "I am very updated!",
+                20,
+                Set.of("action"),
+                LocalDate.of(2020, 1, 1)
+            )
         ));
-        var expectedAuthor0 =
-            new GetAuthorById(author1.id(), "UpdatedAuthor", "I am the updated author!", Set.of());
-        var actualAuthor0 = client.retrieve("/author/id/" + author1.id(), GetAuthorById.class);
-        assertEquals(expectedAuthor0, actualAuthor0);
+        var expectedBook1 = new GetBookById(
+            book1.id(),
+            "UpdatedBook",
+            "I am the updated book!",
+            "I am very updated!",
+            20,
+            Set.of("action"),
+            LocalDate.of(2020, 1, 1),
+            book1.id()
+        );
+        // update book 4
+        var book4 = allBooksAfterInsert.get(4);
+        client.exchange(HttpRequest.PUT(
+            "/book/" + book4.id(),
+            new UpdateBook(
+                "UpdatedBook4",
+                "I am the updated book!",
+                "I am very updated!",
+                20,
+                Set.of("action"),
+                LocalDate.of(2020, 1, 1)
+            )
+        ));
+        var expectedBook4 = new GetBookById(
+            book4.id(),
+            "UpdatedBook4",
+            "I am the updated book!",
+            "I am very updated!",
+            20,
+            Set.of("action"),
+            LocalDate.of(2020, 1, 1),
+            book4.id()
+        );
+        var actualBook4 = client.retrieve("/book/id/" + book4.id(), GetBookById.class);
+        assertEquals(expectedBook4, actualBook4);
 
-        // delete book 5
-        LOG.info("Deleting book 5");
-        var book5 = books.get(5);
-        client.exchange(HttpRequest.DELETE("/author/" + author2.id()));
+        // delete book 0 and 4
+        LOG.info("Deleting book 0 and 4");
+        var book0 = allBooksAfterInsert.get(0);
+        var book5 = allBooksAfterInsert.get(4);
+        client.exchange(HttpRequest.DELETE("/book/batch?ids=%s,%s".formatted(book0.id(), book5.id())));
         assertEquals(3, rootProvider.root().authors().size());
     }
 
