@@ -3,14 +3,14 @@ package one.microstream.demo;
 import one.microstream.demo.domain.Book;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 public record BookNoId(
     String isbn,
     String title,
     String description,
     int pages,
-    Set<String> genres,
+    List<String> genres,
     LocalDate publicationDate
 )
 {
@@ -21,7 +21,7 @@ public record BookNoId(
             book.title(),
             book.description(),
             book.pages(),
-            book.genres(),
+            book.genres().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).toList(),
             book.publicationDate()
         );
     }

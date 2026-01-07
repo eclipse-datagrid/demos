@@ -133,6 +133,7 @@ public class SmokeTest implements TestPropertyProvider
 
         // insert 3 books (book 3-5)
         LOG.info("Inserting 3 books");
+        var author3 = authors.get(3);
         var booksToInsert = List.of(
             new InsertBook(
                 "Book3Isbn",
@@ -141,7 +142,7 @@ public class SmokeTest implements TestPropertyProvider
                 3,
                 Set.of("action"),
                 LocalDate.of(2013, 3, 3),
-                author1.id()
+                author3.id()
             ),
             new InsertBook(
                 "Book4Isbn",
@@ -150,7 +151,7 @@ public class SmokeTest implements TestPropertyProvider
                 4,
                 Set.of("action"),
                 LocalDate.of(2014, 4, 4),
-                author1.id()
+                author3.id()
             ),
             new InsertBook(
                 "Booky5Isbn",
@@ -159,7 +160,7 @@ public class SmokeTest implements TestPropertyProvider
                 3,
                 Set.of("action"),
                 LocalDate.of(2015, 5, 5),
-                author1.id()
+                author3.id()
             )
         );
 
@@ -174,13 +175,13 @@ public class SmokeTest implements TestPropertyProvider
         );
         assertEquals(5, allBooksAfterInsert.size());
 
-        LOG.info("Updating book 1 and 4");
-        // update book 1
-        var book1 = allBooksAfterInsert.get(1);
+        LOG.info("Updating book 0 and 2");
+        // update book 0
+        var insertedBook0 = allBooksAfterInsert.get(0);
         client.exchange(HttpRequest.PUT(
-            "/book/" + book1.id(),
+            "/book/" + insertedBook0.id(),
             new UpdateBook(
-                "UpdatedBook",
+                "UpdatedBook0",
                 "I am the updated book!",
                 "I am very updated!",
                 20,
@@ -188,22 +189,22 @@ public class SmokeTest implements TestPropertyProvider
                 LocalDate.of(2020, 1, 1)
             )
         ));
-        var expectedBook1 = new GetBookById(
-            book1.id(),
-            "UpdatedBook",
+        var expectedBook0 = new GetBookById(
+            insertedBook0.id(),
+            "UpdatedBook0",
             "I am the updated book!",
             "I am very updated!",
             20,
             Set.of("action"),
             LocalDate.of(2020, 1, 1),
-            book1.id()
+            insertedBook0.authorId()
         );
-        // update book 4
-        var book4 = allBooksAfterInsert.get(4);
+        // update book 2
+        var insertedBook2 = allBooksAfterInsert.get(2);
         client.exchange(HttpRequest.PUT(
-            "/book/" + book4.id(),
+            "/book/" + insertedBook2.id(),
             new UpdateBook(
-                "UpdatedBook4",
+                "UpdatedBook2",
                 "I am the updated book!",
                 "I am very updated!",
                 20,
@@ -211,24 +212,26 @@ public class SmokeTest implements TestPropertyProvider
                 LocalDate.of(2020, 1, 1)
             )
         ));
-        var expectedBook4 = new GetBookById(
-            book4.id(),
-            "UpdatedBook4",
+        var expectedBook2 = new GetBookById(
+            insertedBook2.id(),
+            "UpdatedBook2",
             "I am the updated book!",
             "I am very updated!",
             20,
             Set.of("action"),
             LocalDate.of(2020, 1, 1),
-            book4.id()
+            insertedBook2.authorId()
         );
-        var actualBook4 = client.retrieve("/book/id/" + book4.id(), GetBookById.class);
-        assertEquals(expectedBook4, actualBook4);
+        var actualBook0 = client.retrieve("/book/id/" + insertedBook0.id(), GetBookById.class);
+        var actualBook2 = client.retrieve("/book/id/" + insertedBook2.id(), GetBookById.class);
+        assertEquals(expectedBook0, actualBook0);
+        assertEquals(expectedBook2, actualBook2);
 
-        // delete book 0 and 4
-        LOG.info("Deleting book 0 and 4");
-        var book0 = allBooksAfterInsert.get(0);
-        var book5 = allBooksAfterInsert.get(4);
-        client.exchange(HttpRequest.DELETE("/book/batch?ids=%s,%s".formatted(book0.id(), book5.id())));
+        // delete book 1 and 3
+        LOG.info("Deleting book 1 and 3");
+        var book1 = allBooksAfterInsert.get(1);
+        var book3 = allBooksAfterInsert.get(3);
+        client.exchange(HttpRequest.DELETE("/book/batch?ids=%s,%s".formatted(book1.id(), book3.id())));
         assertEquals(3, rootProvider.root().authors().size());
     }
 
@@ -241,55 +244,90 @@ public class SmokeTest implements TestPropertyProvider
     void testDataConsistencyAfterTestAllEndpoints()
     {
         // restart and check if the state is the same as before
-        var expectedGenres = Set.of("action");
+        var expectedGenres = List.of("action");
         var expectedAuthors = List.of(
-            new AuthorNoId("Author0", "I am the nr. 0 author.", Set.of()),
-            new AuthorNoId("UpdatedAuthor", "I am the updated author!", Set.of()),
+            new AuthorNoId("Author0", "I am the nr. 0 author.", List.of()),
             new AuthorNoId(
                 "AuthorWithBooks",
                 "I am an author with books!",
-                Set.of(
+                List.of(
                     new BookNoId(
-                        "Book1Isbn",
-                        "Book1Title",
-                        "Book1Description",
-                        1,
-                        Set.of("action"),
-                        LocalDate.of(2010, 1, 1)
+                        "Booky5Isbn",
+                        "Book5Title",
+                        "Book5Description",
+                        3,
+                        List.of("action"),
+                        LocalDate.of(2015, 5, 5)
                     ),
                     new BookNoId(
-                        "Book2Isbn",
-                        "Book2Title",
-                        "Book2Description",
-                        2,
-                        Set.of("action"),
-                        LocalDate.of(2010, 1, 1)
+                        "UpdatedBook0",
+                        "I am the updated book!",
+                        "I am very updated!",
+                        20,
+                        List.of("action"),
+                        LocalDate.of(2020, 1, 1)
+                    ),
+                    new BookNoId(
+                        "UpdatedBook2",
+                        "I am the updated book!",
+                        "I am very updated!",
+                        20,
+                        List.of("action"),
+                        LocalDate.of(2020, 1, 1)
                     )
                 )
-            )
+            ),
+            new AuthorNoId("UpdatedAuthor", "I am the updated author!", List.of())
         );
         var expectedBooks = List.<BookNoId>of(
             new BookNoId(
-                "Book1Isbn",
-                "Book1Title",
-                "Book1Description",
-                1,
-                Set.of("action"),
-                LocalDate.of(2010, 1, 1)
+                "Booky5Isbn",
+                "Book5Title",
+                "Book5Description",
+                3,
+                List.of("action"),
+                LocalDate.of(2015, 5, 5)
             ),
             new BookNoId(
-                "Book2Isbn",
-                "Book2Title",
-                "Book2Description",
-                2,
-                Set.of("action"),
-                LocalDate.of(2010, 1, 1)
+                "UpdatedBook0",
+                "I am the updated book!",
+                "I am very updated!",
+                20,
+                List.of("action"),
+                LocalDate.of(2020, 1, 1)
+            ),
+            new BookNoId(
+                "UpdatedBook2",
+                "I am the updated book!",
+                "I am very updated!",
+                20,
+                List.of("action"),
+                LocalDate.of(2020, 1, 1)
             )
         );
 
         var actualGenres = rootProvider.root().genres();
-        var actualAuthors = rootProvider.root().authors().query().toList().stream().map(AuthorNoId::from).toList();
-        var actualBooks = rootProvider.root().books().query().toList().stream().map(BookNoId::from).toList();
+        var actualAuthors = rootProvider.root()
+            .authors()
+            .query()
+            .toList()
+            .stream()
+            .map(AuthorNoId::from)
+            .sorted((a, b) -> a.name().compareTo(b.name()))
+            .toList();
+        var actualBooks = rootProvider.root()
+            .books()
+            .query()
+            .toList()
+            .stream()
+            .map(BookNoId::from)
+            .sorted((a, b) -> a.isbn().compareTo(b.isbn()))
+            .toList();
+
+        for (final var a : actualAuthors)
+        {
+            System.out.println(a);
+        }
 
         LOG.info("Checking data consistency");
         assertTrue(expectedGenres.containsAll(actualGenres));
