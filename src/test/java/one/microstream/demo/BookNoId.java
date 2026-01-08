@@ -21,7 +21,7 @@ public record BookNoId(
             book.title(),
             book.description(),
             book.pages(),
-            book.genres().stream().sorted((a, b) -> a.toString().compareTo(b.toString())).toList(),
+            book.genres().stream().sorted().toList(),
             book.publicationDate()
         );
     }

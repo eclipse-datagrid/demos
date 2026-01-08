@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -313,7 +310,7 @@ public class SmokeTest implements TestPropertyProvider
             .toList()
             .stream()
             .map(AuthorNoId::from)
-            .sorted((a, b) -> a.name().compareTo(b.name()))
+            .sorted(Comparator.comparing(AuthorNoId::name))
             .toList();
         var actualBooks = rootProvider.root()
             .books()
@@ -321,7 +318,7 @@ public class SmokeTest implements TestPropertyProvider
             .toList()
             .stream()
             .map(BookNoId::from)
-            .sorted((a, b) -> a.isbn().compareTo(b.isbn()))
+            .sorted(Comparator.comparing(BookNoId::isbn))
             .toList();
 
         for (final var a : actualAuthors)
