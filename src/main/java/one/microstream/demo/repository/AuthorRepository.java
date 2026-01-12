@@ -1,7 +1,6 @@
 package one.microstream.demo.repository;
 
 import io.micronaut.eclipsestore.RootProvider;
-import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import one.microstream.demo.domain.Author;
 import one.microstream.demo.domain.Book;
@@ -19,7 +18,6 @@ import one.microstream.demo.gigamap.GigaMapBookIndices;
 import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterLockScope;
 import org.eclipse.serializer.concurrency.LockedExecutor;
 import org.eclipse.serializer.reference.Lazy;
-import org.eclipse.store.gigamap.lucene.LuceneIndex;
 import org.eclipse.store.gigamap.types.GigaMap;
 
 import java.util.*;
@@ -37,10 +35,6 @@ import java.util.*;
 public class AuthorRepository extends ClusterLockScope
 {
     private static final int DEFAULT_PAGE_SIZE = 512;
-
-    // eager load lucene to avoid GigaMap not storing the index when inserting authors with books
-    @Inject
-    LuceneIndex<Book> luceneIndex;
 
     private final GigaMap<Author> authors;
     private final GigaMap<Book> books;
