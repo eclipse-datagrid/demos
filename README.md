@@ -5,7 +5,15 @@ Demo application featuring a bookstore demo REST-application using the EclipseSt
 To start the application execute the following command:
 
 ```shell
-mvn --add-exports java.base/jdk.internal.misc=ALL-UNNAMED mn:run
+mvn mn:run
+```
+
+### Running tests
+
+To run the JUnit tests execute the following command:
+
+```shell
+mvn test
 ```
 
 ## Endpoints
