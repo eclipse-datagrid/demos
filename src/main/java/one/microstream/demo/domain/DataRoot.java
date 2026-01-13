@@ -1,12 +1,13 @@
 
 package one.microstream.demo.domain;
 
-import one.microstream.demo.gigamap.GigaMapAuthorIndices;
-import one.microstream.demo.gigamap.GigaMapBookIndices;
-import org.eclipse.store.gigamap.types.GigaMap;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.eclipse.store.gigamap.types.GigaMap;
+
+import one.microstream.demo.gigamap.GigaMapAuthorIndices;
+import one.microstream.demo.gigamap.GigaMapBookIndices;
 
 public final class DataRoot
 {
@@ -16,8 +17,6 @@ public final class DataRoot
         .build();
     private final GigaMap<Book> books = GigaMap.<Book>Builder()
         .withBitmapIdentityIndex(GigaMapBookIndices.ID)
-        .withBitmapIndex(GigaMapBookIndices.TITLE)
-        .withBitmapIndex(GigaMapBookIndices.GENRES)
         .withBitmapIndex(GigaMapBookIndices.ISBN)
         .withBitmapIndex(GigaMapBookIndices.PUBLICATION)
         .build();

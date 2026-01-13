@@ -1,9 +1,12 @@
 package one.microstream.demo.gigamap;
 
-import one.microstream.demo.domain.Book;
-import org.eclipse.store.gigamap.types.*;
-
 import java.util.UUID;
+
+import org.eclipse.store.gigamap.types.BinaryIndexerString;
+import org.eclipse.store.gigamap.types.BinaryIndexerUUID;
+import org.eclipse.store.gigamap.types.IndexerLocalDate;
+
+import one.microstream.demo.domain.Book;
 
 public final class GigaMapBookIndices
 {
@@ -33,42 +36,6 @@ public final class GigaMapBookIndices
         protected String getString(final Book entity)
         {
             return entity.isbn();
-        }
-    };
-
-    public static final IndexerMultiValue<Book, String> GENRES = new IndexerMultiValue.Abstract<Book, String>()
-    {
-        @Override
-        public String name()
-        {
-            return "genres";
-        }
-
-        @Override
-        public Iterable<? extends String> indexEntityMultiValue(final Book entity)
-        {
-            return entity.genres();
-        }
-
-        @Override
-        public Class<String> keyType()
-        {
-            return String.class;
-        }
-    };
-
-    public static final IndexerString<Book> TITLE = new IndexerString.Abstract<>()
-    {
-        @Override
-        public String name()
-        {
-            return "title";
-        }
-
-        @Override
-        protected String getString(final Book entity)
-        {
-            return entity.title();
         }
     };
 
