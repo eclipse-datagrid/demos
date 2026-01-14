@@ -1,8 +1,8 @@
 package one.microstream.demo.lucene;
 
+import one.microstream.demo.Application;
 import one.microstream.demo.domain.DataRoot;
 import org.apache.lucene.store.*;
-import org.eclipse.serializer.concurrency.LockedExecutor;
 import org.eclipse.serializer.reference.Lazy;
 import org.eclipse.store.gigamap.lucene.DirectoryCreator;
 import org.eclipse.store.storage.types.StorageManager;
@@ -18,23 +18,18 @@ public class EclipseStoreDirectory extends BaseDirectory
     private final ConcurrentHashMap<String, FileEntry> files = new ConcurrentHashMap<>();
 
     private transient final StorageManager storageManager;
-    private transient final LockedExecutor lockedExecutor;
 
-    public EclipseStoreDirectory(
-        final StorageManager storageManager,
-        final LockedExecutor lockedExecutor
-    )
+    public EclipseStoreDirectory(final StorageManager storageManager)
     {
         super(new SingleInstanceLockFactory());
         this.storageManager = Objects.requireNonNull(storageManager);
-        this.lockedExecutor = Objects.requireNonNull(lockedExecutor);
     }
 
     @Override
     public String[] listAll() throws AlreadyClosedException
     {
         ensureOpen();
-        return lockedExecutor.read(() -> files.keySet().stream().sorted().toArray(String[]::new));
+        return files.keySet().stream().sorted().toArray(String[]::new);
     }
 
     @Override
@@ -89,10 +84,7 @@ public class EclipseStoreDirectory extends BaseDirectory
     {
         this.ensureOpen();
         final var eagerStore = this.storageManager.createEagerStorer();
-        this.files.entrySet()
-            .stream()
-            .filter(e -> names.contains(e.getKey()))
-            .forEach(e -> eagerStore.store(e.getValue()));
+        eagerStore.store(this.files);
         eagerStore.commit();
     }
 
@@ -151,25 +143,19 @@ public class EclipseStoreDirectory extends BaseDirectory
 
     public static class EclipseStoreDirectoryCreator extends DirectoryCreator
     {
-        private final transient StorageManager storageManager;
-        private final transient LockedExecutor lockedExecutor;
-
         public EclipseStoreDirectoryCreator(
-            final StorageManager storageManager,
-            final LockedExecutor lockedExecutor
         )
         {
-            this.storageManager = storageManager;
-            this.lockedExecutor = lockedExecutor;
         }
 
         @Override
         public Directory createDirectory()
         {
-            final var dir = new EclipseStoreDirectory(storageManager, lockedExecutor);
-            final var root = ((Lazy<DataRoot>)storageManager.root()).get();
+            final StorageManager sm = Application.SM;
+            final var dir = new EclipseStoreDirectory(sm);
+            final var root = ((Lazy<DataRoot>)sm.root()).get();
             root.luceneDirectory = dir;
-            storageManager.store(root);
+            sm.store(root);
             return dir;
         }
     }

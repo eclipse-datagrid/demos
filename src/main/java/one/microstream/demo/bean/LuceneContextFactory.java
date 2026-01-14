@@ -21,7 +21,7 @@ public class LuceneContextFactory
     )
     {
         return LuceneContext.New(
-            new EclipseStoreDirectoryCreator(storageManager, lockedExecutor),
+            new EclipseStoreDirectoryCreator(),
             new BookDocumentPopulator()
         );
     }
