@@ -1,0 +1,416 @@
+{
+	"info": {
+		"_postman_id": "60b6ce5c-1861-4cc2-95c7-4472bd8e947f",
+		"name": "Cluster Storage Example Demo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "29203804"
+	},
+	"item": [
+		{
+			"name": "Genre",
+			"item": [
+				{
+					"name": "Insert",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/genre/thriller",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"genre",
+								"thriller"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/genre",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"genre"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/genre/horror",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"genre",
+								"horror"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Author",
+			"item": [
+				{
+					"name": "Insert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"about\": \"{{$randomCatchPhrase}}\"\r\n},\r\n{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"about\": \"{{$randomCatchPhrase}}\"\r\n}]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{urlPrefix}}/author",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"author"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{$randomFullName}}\",\r\n    \"about\": \"{{$randomCatchPhrase}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{urlPrefix}}/author/becdd3e7-1750-4b67-aaae-ccc693bcd501",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"author",
+								"becdd3e7-1750-4b67-aaae-ccc693bcd501"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/author/id/3e8593c0-e343-4d3d-8818-d07642bb9d15",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"author",
+								"id",
+								"3e8593c0-e343-4d3d-8818-d07642bb9d15"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search By Name",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/author/name?search=a",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"author",
+								"name"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/author/4ff4b5b8-aca9-472f-b7f6-0f66389883dd",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"author",
+								"4ff4b5b8-aca9-472f-b7f6-0f66389883dd"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Batch Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/author/batch?ids=5162ec93-5fdb-48d1-9529-92be7659c645,805e4af2-948c-41ba-8fe2-bccdf8f6d5d4",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"author",
+								"batch"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "5162ec93-5fdb-48d1-9529-92be7659c645,805e4af2-948c-41ba-8fe2-bccdf8f6d5d4"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Book",
+			"item": [
+				{
+					"name": "Insert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[{\r\n    \"isbn\": \"{{$guid}}\",\r\n    \"title\": \"{{$randomWords}}\",\r\n    \"description\": \"{{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}}\",\r\n    \"pages\": {{$randomInt}},\r\n    \"genres\": [ \"action\", \"horror\" ],\r\n    \"publicationDate\": \"2020-10-10\",\r\n    \"authorId\": \"67bd189f-fa34-4213-8020-9783efbc280a\"\r\n},\r\n{\r\n    \"isbn\": \"{{$guid}}\",\r\n    \"title\": \"{{$randomWords}}\",\r\n    \"description\": \"{{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}} {{$randomWords}}\",\r\n    \"pages\": {{$randomInt}},\r\n    \"genres\": [ \"thriller\" ],\r\n    \"publicationDate\": \"2020-10-10\",\r\n    \"authorId\": \"67bd189f-fa34-4213-8020-9783efbc280a\"\r\n}]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{urlPrefix}}/book",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"isbn\": \"ba6b9655-ecc3-4a61-ac35-ef34b33fa8b2\",\r\n    \"title\": \"Michael management\",\r\n    \"description\": \"Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish Philippines withdrawal Fish \",\r\n    \"pages\": 20,\r\n    \"genres\": [\r\n        \"thriller\"\r\n    ],\r\n    \"publicationDate\": \"2020-10-10\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{urlPrefix}}/book/183cd205-1b9b-49dd-a282-7d2522b2ff68",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"183cd205-1b9b-49dd-a282-7d2522b2ff68"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/book/id/183cd205-1b9b-49dd-a282-7d2522b2ff68",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"id",
+								"183cd205-1b9b-49dd-a282-7d2522b2ff68"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By ISBN",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/book/isbn/ba6b9655-ecc3-4a61-ac35-ef34b33fa8b2",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"isbn",
+								"ba6b9655-ecc3-4a61-ac35-ef34b33fa8b2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search By Author",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/book/author/67bd189f-fa34-4213-8020-9783efbc280a",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"author",
+								"67bd189f-fa34-4213-8020-9783efbc280a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search By Title",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/book/title?search=a",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"title"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search By Genre",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/book/genre?genres=horror",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"genre"
+							],
+							"query": [
+								{
+									"key": "genres",
+									"value": "horror"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/book/6d56b327-f5d3-4148-82e5-6e989e3ad47c",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"6d56b327-f5d3-4148-82e5-6e989e3ad47c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Batch Delete",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{urlPrefix}}/book/batch?ids=2707a467-b02b-41ae-94a9-abacb2088dd7,322223cb-ed9d-4e51-b360-d51128bd271e",
+							"host": [
+								"{{urlPrefix}}"
+							],
+							"path": [
+								"book",
+								"batch"
+							],
+							"query": [
+								{
+									"key": "ids",
+									"value": "2707a467-b02b-41ae-94a9-abacb2088dd7,322223cb-ed9d-4e51-b360-d51128bd271e"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
