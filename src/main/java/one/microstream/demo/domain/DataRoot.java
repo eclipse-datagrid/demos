@@ -1,16 +1,18 @@
 
 package one.microstream.demo.domain;
 
+import one.microstream.demo.gigamap.GigaMapAuthorIndices;
+import one.microstream.demo.gigamap.GigaMapBookIndices;
+import one.microstream.demo.lucene.EclipseStoreDirectory;
+import org.eclipse.store.gigamap.types.GigaMap;
+
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.store.gigamap.types.GigaMap;
-
-import one.microstream.demo.gigamap.GigaMapAuthorIndices;
-import one.microstream.demo.gigamap.GigaMapBookIndices;
-
 public final class DataRoot
 {
+    public EclipseStoreDirectory luceneDirectory;
+
     private final GigaMap<Author> authors = GigaMap.<Author>Builder()
         .withBitmapIdentityIndex(GigaMapAuthorIndices.ID)
         .withBitmapIndex(GigaMapAuthorIndices.NAME)

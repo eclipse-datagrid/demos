@@ -4,19 +4,19 @@ import org.apache.lucene.store.IndexOutput;
 
 import java.io.IOException;
 import java.util.Locale;
-import java.util.zip.CRC32C;
+import java.util.zip.CRC32;
 
 public class EclipseStoreIndexOutput extends IndexOutput
 {
     private final FileEntry entry;
 
-    private CRC32C checksum = new CRC32C();
-    private int pointer = 0;
+    private final CRC32 checksum = new CRC32();
+    private long pointer = 0;
 
     public EclipseStoreIndexOutput(final String fileName, FileEntry fileEntry)
     {
         super(
-            String.format(Locale.ROOT, "%s(file=%s)", EclipseStoreDirectory.class.getSimpleName(), fileName),
+            String.format(Locale.ROOT, "%s(file=%s)", EclipseStoreIndexOutput.class.getSimpleName(), fileName),
             fileName
         );
         this.entry = fileEntry;
@@ -48,8 +48,9 @@ public class EclipseStoreIndexOutput extends IndexOutput
             throw new IOException("Files bigger than 100KB are not supported");
         }
         this.checksum.update((int)b);
-        content[this.pointer] = b;
+        content[(int)this.pointer] = b;
         this.pointer++;
+        this.entry.setLength(this.pointer);
     }
 
     @Override
@@ -61,6 +62,8 @@ public class EclipseStoreIndexOutput extends IndexOutput
             throw new IOException("Files bigger than 100KB are not supported");
         }
         this.checksum.update(b, offset, length);
-        System.arraycopy(b, offset, content, pointer, length);
+        System.arraycopy(b, offset, content, (int)pointer, length);
+        pointer += length;
+        this.entry.setLength(pointer);
     }
 }
