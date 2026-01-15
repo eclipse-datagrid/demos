@@ -121,6 +121,12 @@ public class BookRepository extends ClusterLockScope
 
             // only store the changed author book lists
             this.storageManager.storeAll(cachedAuthors.values().stream().map(a -> a.books().get()).toList());
+
+            // FIXME: DEBUG
+            System.out.println("DEBUG STORING ALL");
+            final var s = this.storageManager.createEagerStorer();
+            s.store(this.storageManager.root());
+            s.commit();
         });
 
         return Collections.unmodifiableList(returnDtos);
