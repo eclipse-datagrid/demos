@@ -141,9 +141,9 @@ public class EclipseStoreDirectory extends BaseDirectory
         return Set.of();
     }
 
-    public static class EclipseStoreDirectoryCreator extends DirectoryCreator
+    public static class Creator extends DirectoryCreator
     {
-        public EclipseStoreDirectoryCreator(
+        public Creator(
         )
         {
         }
@@ -152,11 +152,14 @@ public class EclipseStoreDirectory extends BaseDirectory
         public Directory createDirectory()
         {
             final StorageManager sm = Application.SM;
-            final var dir = new EclipseStoreDirectory(sm);
-            final var root = ((Lazy<DataRoot>)sm.root()).get();
-            root.luceneDirectory = dir;
-            sm.store(root);
-            return dir;
+            var root = ((Lazy<DataRoot>)sm.root()).get();
+            if (root.luceneDirectory == null)
+            {
+                System.out.println("GENERATING NEW BYTEBUFFERSDIRECTORY");
+                root.luceneDirectory = new ByteBuffersDirectory();
+                sm.store(root);
+            }
+            return root.luceneDirectory;
         }
     }
 }

@@ -5,7 +5,7 @@ import io.micronaut.context.annotation.Property;
 import jakarta.inject.Singleton;
 import one.microstream.demo.domain.Book;
 import one.microstream.demo.lucene.BookDocumentPopulator;
-import one.microstream.demo.lucene.EclipseStoreDirectory.EclipseStoreDirectoryCreator;
+import one.microstream.demo.lucene.EclipseStoreDirectory;
 import org.eclipse.serializer.concurrency.LockedExecutor;
 import org.eclipse.store.gigamap.lucene.LuceneContext;
 import org.eclipse.store.storage.types.StorageManager;
@@ -21,7 +21,8 @@ public class LuceneContextFactory
     )
     {
         return LuceneContext.New(
-            new EclipseStoreDirectoryCreator(),
+            //Paths.get(storageDirectory),
+            new EclipseStoreDirectory.Creator(),
             new BookDocumentPopulator()
         );
     }

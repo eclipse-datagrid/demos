@@ -22,7 +22,7 @@ public class BookLuceneIndexFactory
     )
     {
         @SuppressWarnings("unchecked")
-        LuceneIndex<Book> index = storageManager.root().books().index().get(LuceneIndex.class);
+        LuceneIndex index = storageManager.root().books().index().get(LuceneIndex.class);
         if (index == null)
         {
             LOG.info("Creating new lucene index");
