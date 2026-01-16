@@ -9,12 +9,11 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import one.microstream.demo.bean.DataGenerator;
+import one.microstream.demo.DataGenerator;
 import one.microstream.demo.dto.GenerateData;
 import one.microstream.demo.repository.AuthorRepository;
 import one.microstream.demo.repository.BookRepository;
 import one.microstream.demo.repository.GenreRepository;
-import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterFoundation;
 
 /**
  * {@link Controller} class for generating data.
@@ -23,19 +22,16 @@ import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterFoundation;
 @Controller("/data")
 public class DataController
 {
-    private final ClusterFoundation<?> foundation;
     private final GenreRepository genres;
     private final AuthorRepository authors;
     private final BookRepository books;
 
     public DataController(
-        ClusterFoundation<?> foundation,
         GenreRepository genres,
         AuthorRepository authors,
         BookRepository books
     )
     {
-        this.foundation = foundation;
         this.genres = genres;
         this.authors = authors;
         this.books = books;
@@ -48,7 +44,6 @@ public class DataController
     public void generateData(@NonNull @Valid @Body GenerateData config)
     {
         var generator = new DataGenerator(
-            foundation,
             genres,
             authors,
             books,
