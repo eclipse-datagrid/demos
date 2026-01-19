@@ -58,6 +58,13 @@
             <version>1.0.2</version>
         </dependency>
 
+        <!-- Nodelibrary -->
+        <dependency>
+            <groupId>org.eclipse.datagrid</groupId>
+            <artifactId>cluster-nodelibrary-micronaut</artifactId>
+            <version>1.17.2</version>
+        </dependency>
+
         <!-- GigaMap -->
         <dependency>
             <groupId>org.eclipse.store</groupId>
@@ -65,12 +72,21 @@
             <version>${eclipsestore.version}</version>
         </dependency>
 
-        <!-- Nodelibrary -->
+        <!-- Lucene -->
         <dependency>
-            <groupId>org.eclipse.datagrid</groupId>
-            <artifactId>cluster-nodelibrary-micronaut</artifactId>
-            <!--<version>1.17.2</version>-->
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>org.eclipse.store</groupId>
+            <artifactId>gigamap-lucene</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
 
         <!-- Eclipse Store -->

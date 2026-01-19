@@ -137,15 +137,18 @@ public class DataGenerator
                     randomDateBetween(faker, LocalDate.of(1900, 1, 1), LocalDate.now().minusDays(1)),
                     authorIds.get(faker.number().numberBetween(0, authorIds.size()))
                 );
-                try
+                if (newBooks.stream().noneMatch(b -> b.isbn().equals(newBook.isbn())))
                 {
-                    // we expect this to throw as there should not be a book with identical ISBN
-                    this.books.getByISBN(newBook.isbn());
-                }
-                catch (final MissingBookException ignored)
-                {
-                    newBooks.add(newBook);
-                    break;
+                    try
+                    {
+                        // we expect this to throw as there should not be a book with identical ISBN
+                        this.books.getByISBN(newBook.isbn());
+                    }
+                    catch (final MissingBookException ignored)
+                    {
+                        newBooks.add(newBook);
+                        break;
+                    }
                 }
             }
             if (tryCount == 10)
