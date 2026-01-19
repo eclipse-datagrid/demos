@@ -9,8 +9,15 @@ import one.microstream.demo.dto.*;
 import one.microstream.demo.exception.*;
 import one.microstream.demo.gigamap.GigaMapAuthorIndices;
 import one.microstream.demo.gigamap.GigaMapBookIndices;
+import one.microstream.demo.lucene.BookDocumentPopulator;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.WildcardQuery;
 import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterLockScope;
 import org.eclipse.serializer.concurrency.LockedExecutor;
+import org.eclipse.store.gigamap.lucene.LuceneIndex;
 import org.eclipse.store.gigamap.types.GigaMap;
 import org.eclipse.store.storage.types.StorageManager;
 
@@ -31,11 +38,13 @@ public class BookRepository extends ClusterLockScope
     private final GigaMap<Book> books;
     private final GigaMap<Author> authors;
     private final Set<String> genres;
+    private final LuceneIndex<Book> luceneIndex;
     private final StorageManager storageManager;
 
     public BookRepository(
         final LockedExecutor executor,
         final RootProvider<DataRoot> rootProvider,
+        final LuceneIndex<Book> luceneIndex,
         final StorageManager storageManager
     )
     {
@@ -44,6 +53,7 @@ public class BookRepository extends ClusterLockScope
         this.books = root.books();
         this.authors = root.authors();
         this.genres = root.genres();
+        this.luceneIndex = luceneIndex;
         this.storageManager = storageManager;
     }
 
@@ -258,36 +268,34 @@ public class BookRepository extends ClusterLockScope
      *
      * @param titleWildcardSearch the wildcard search text the title field will be searched with
      * @return a read-only list of all found books for the specified query
+     * @see WildcardQuery
      */
     public List<SearchBookByTitle> searchByTitle(final String titleWildcardSearch)
     {
-        return this.read(() ->
-        {
-            final var query = this.books.query(GigaMapBookIndices.TITLE.containsIgnoreCase(titleWildcardSearch));
-            try (final var queryStream = query.stream())
-            {
-                return queryStream.map(SearchBookByTitle::from).toList();
-            }
-        });
+        final String fullWildcardSearch = "*" + titleWildcardSearch + "*";
+        final var query = new WildcardQuery(new Term(BookDocumentPopulator.TITLE_FIELD, fullWildcardSearch));
+        return this.read(() -> this.luceneIndex.query(query)).stream().map(SearchBookByTitle::from).toList();
     }
 
     /**
-     * Searches the books {@link GigaMap} for the specified genres, returning every book which contains all the
-     * specified genres.
-     *
      * @param genres the genres which will be searched for
      * @return a list of all found books for the specified set of genres
+     * @see TermQuery
+     * @see BooleanQuery
      */
     public List<SearchBookByGenre> searchByGenre(final Set<String> genres)
     {
-        return this.read(() ->
+        final BooleanQuery query;
         {
-            final var query = this.books.query(GigaMapBookIndices.GENRES.all(genres.toArray(String[]::new)));
-            try (final var queryStream = query.stream())
+            final var queryBuilder = new BooleanQuery.Builder();
+            for (final var genre : genres)
             {
-                return queryStream.map(SearchBookByGenre::from).toList();
+                final var termQuery = new TermQuery(new Term(BookDocumentPopulator.GENRES_FIELD, genre));
+                queryBuilder.add(termQuery, BooleanClause.Occur.MUST);
             }
-        });
+            query = queryBuilder.build();
+        }
+        return this.read(() -> this.luceneIndex.query(query)).stream().map(SearchBookByGenre::from).toList();
     }
 
     private void validateInsert(final List<InsertBook> insert) throws InvalidIsbnException, InvalidGenreException

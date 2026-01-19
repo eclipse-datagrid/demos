@@ -16,8 +16,6 @@ public final class DataRoot
         .build();
     private final GigaMap<Book> books = GigaMap.<Book>Builder()
         .withBitmapIdentityIndex(GigaMapBookIndices.ID)
-        .withBitmapIndex(GigaMapBookIndices.TITLE)
-        .withBitmapIndex(GigaMapBookIndices.GENRES)
         .withBitmapIndex(GigaMapBookIndices.ISBN)
         .withBitmapIndex(GigaMapBookIndices.PUBLICATION)
         .build();
