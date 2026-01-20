@@ -1,6 +1,6 @@
 package one.microstream.demo;
 
-import com.github.javafaker.Faker;
+import net.datafaker.Faker;
 import one.microstream.demo.dto.GenerateData.DataGenerationConfig;
 import one.microstream.demo.dto.GetAuthorById;
 import one.microstream.demo.dto.InsertAuthor;
@@ -161,21 +161,20 @@ public class DataGenerator
     {
         if (seed == null)
         {
-            return Faker.instance();
+            return new Faker();
         }
         else
         {
-            return Faker.instance(new Random(seed));
+            return new Faker(new Random(seed));
         }
     }
 
     private static LocalDate randomDateBetween(Faker faker, LocalDate start, LocalDate end)
     {
         final var zone = ZoneOffset.UTC;
-        final var convertedStart = Date.from(Instant.from(start.atTime(LocalTime.of(0, 0)).atOffset(zone)));
-        final var convertedEnd = Date.from(Instant.from(end.atTime(LocalTime.of(0, 0)).atOffset(zone)));
-
-        final var date = faker.date().between(convertedStart, convertedEnd);
-        return LocalDate.ofInstant(date.toInstant(), zone);
+        final var convertedStart = Instant.from(start.atTime(LocalTime.of(0, 0)).atOffset(zone));
+        final var convertedEnd = Instant.from(end.atTime(LocalTime.of(0, 0)).atOffset(zone));
+        final Instant between = faker.timeAndDate().between(convertedStart, convertedEnd);
+        return LocalDate.ofInstant(between, zone);
     }
 }

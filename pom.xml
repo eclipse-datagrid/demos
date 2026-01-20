@@ -53,9 +53,9 @@
     <dependencies>
         <!-- Fake data generation for testing -->
         <dependency>
-            <groupId>com.github.javafaker</groupId>
-            <artifactId>javafaker</artifactId>
-            <version>1.0.2</version>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>2.5.3</version>
         </dependency>
 
         <!-- GigaMap -->
