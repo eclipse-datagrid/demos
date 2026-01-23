@@ -1,13 +1,7 @@
 package one.microstream.demo.controller;
 
-import java.util.Set;
-
 import io.micronaut.core.annotation.NonNull;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Delete;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.PathVariable;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +10,8 @@ import jakarta.validation.constraints.NotBlank;
 import one.microstream.demo.exception.InvalidGenreException;
 import one.microstream.demo.exception.MissingGenreException;
 import one.microstream.demo.repository.GenreRepository;
+
+import java.util.Set;
 
 /**
  * {@link Controller} class for finding and modifying genres.
@@ -50,7 +46,7 @@ public class GenreController
     @Get
     public Set<String> list()
     {
-        return this.genres.list();
+        return this.genres.findAllName();
     }
 
     @Operation(summary = "Delete a genre")
@@ -62,6 +58,6 @@ public class GenreController
     @Delete("/{genre}")
     public void delete(@NonNull @NotBlank @PathVariable final String genre) throws MissingGenreException
     {
-        this.genres.delete(genre);
+        this.genres.deleteOneByName(genre);
     }
 }

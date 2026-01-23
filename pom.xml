@@ -74,24 +74,24 @@
         </dependency>
 
         <!-- Eclipse Store -->
-        <dependency>
-            <groupId>io.micronaut.eclipsestore</groupId>
-            <artifactId>micronaut-eclipsestore</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.eclipse.serializer</groupId>
-                    <artifactId>persistence-binary-jdk8</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.eclipse.serializer</groupId>
-                    <artifactId>persistence-binary-jdk17</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.micronaut.eclipsestore</groupId>
-            <artifactId>micronaut-eclipsestore-annotations</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>io.micronaut.eclipsestore</groupId>-->
+<!--            <artifactId>micronaut-eclipsestore</artifactId>-->
+<!--            <exclusions>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.serializer</groupId>-->
+<!--                    <artifactId>persistence-binary-jdk8</artifactId>-->
+<!--                </exclusion>-->
+<!--                <exclusion>-->
+<!--                    <groupId>org.eclipse.serializer</groupId>-->
+<!--                    <artifactId>persistence-binary-jdk17</artifactId>-->
+<!--                </exclusion>-->
+<!--            </exclusions>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.micronaut.eclipsestore</groupId>-->
+<!--            <artifactId>micronaut-eclipsestore-annotations</artifactId>-->
+<!--        </dependency>-->
 
         <!-- Logging -->
         <dependency>
