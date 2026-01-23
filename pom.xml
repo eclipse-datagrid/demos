@@ -58,19 +58,19 @@
             <version>1.0.2</version>
         </dependency>
 
-        <!-- GigaMap -->
+        <!-- Micronaut Data / Cache -->
         <dependency>
-            <groupId>org.eclipse.store</groupId>
-            <artifactId>gigamap</artifactId>
-            <version>${eclipsestore.version}</version>
+            <groupId>io.micronaut.data</groupId>
+            <artifactId>micronaut-data-hibernate-jpa</artifactId>
         </dependency>
-
-        <!-- Nodelibrary -->
         <dependency>
-            <groupId>org.eclipse.datagrid</groupId>
-            <artifactId>cluster-nodelibrary-micronaut</artifactId>
-            <!--<version>1.17.2</version>-->
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>io.micronaut.sql</groupId>
+            <artifactId>micronaut-jdbc-hikari</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
 
         <!-- Eclipse Store -->
@@ -240,6 +240,17 @@
                             <groupId>io.micronaut.validation</groupId>
                             <artifactId>micronaut-validation-processor</artifactId>
                             <version>${micronaut.validation.version}</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>io.micronaut</groupId>
+                                    <artifactId>micronaut-inject</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </path>
+                        <path>
+                            <groupId>io.micronaut.data</groupId>
+                            <artifactId>micronaut-data-processor</artifactId>
+                            <version>${micronaut.data.version}</version>
                             <exclusions>
                                 <exclusion>
                                     <groupId>io.micronaut</groupId>
