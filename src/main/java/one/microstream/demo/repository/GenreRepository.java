@@ -38,5 +38,5 @@ public interface GenreRepository extends GenericRepository<Genre, Long>
      * @param genre the genre to remove
      * @throws MissingGenreException if the specified genre could not be found
      */
-    void deleteOneByName(final String genre);
+    void deleteByName(final String genre);
 }

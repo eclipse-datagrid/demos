@@ -58,6 +58,6 @@ public class GenreController
     @Delete("/{genre}")
     public void delete(@NonNull @NotBlank @PathVariable final String genre) throws MissingGenreException
     {
-        this.genres.deleteOneByName(genre);
+        this.genres.deleteByName(genre);
     }
 }

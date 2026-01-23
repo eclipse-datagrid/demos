@@ -72,26 +72,11 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-
-        <!-- Eclipse Store -->
-<!--        <dependency>-->
-<!--            <groupId>io.micronaut.eclipsestore</groupId>-->
-<!--            <artifactId>micronaut-eclipsestore</artifactId>-->
-<!--            <exclusions>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.eclipse.serializer</groupId>-->
-<!--                    <artifactId>persistence-binary-jdk8</artifactId>-->
-<!--                </exclusion>-->
-<!--                <exclusion>-->
-<!--                    <groupId>org.eclipse.serializer</groupId>-->
-<!--                    <artifactId>persistence-binary-jdk17</artifactId>-->
-<!--                </exclusion>-->
-<!--            </exclusions>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>io.micronaut.eclipsestore</groupId>-->
-<!--            <artifactId>micronaut-eclipsestore-annotations</artifactId>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.eclipse.store</groupId>
+            <artifactId>cache-hibernate</artifactId>
+            <version>${eclipsestore.version}</version>
+        </dependency>
 
         <!-- Logging -->
         <dependency>
@@ -202,17 +187,6 @@
                             <groupId>io.micronaut</groupId>
                             <artifactId>micronaut-http-validation</artifactId>
                             <version>${micronaut.core.version}</version>
-                        </path>
-                        <path>
-                            <groupId>io.micronaut.eclipsestore</groupId>
-                            <artifactId>micronaut-eclipsestore-annotations</artifactId>
-                            <version>${micronaut.eclipsestore.version}</version>
-                            <exclusions>
-                                <exclusion>
-                                    <groupId>io.micronaut</groupId>
-                                    <artifactId>micronaut-inject</artifactId>
-                                </exclusion>
-                            </exclusions>
                         </path>
                         <path>
                             <groupId>io.micronaut.openapi</groupId>
