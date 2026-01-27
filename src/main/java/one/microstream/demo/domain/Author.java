@@ -4,43 +4,40 @@ import io.micronaut.core.annotation.Introspected;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.serde.annotation.Serdeable;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Serdeable
 @Introspected
 @Entity
-public class Genre
+public class Author
 {
-    public static Set<String> getGenreNames(Set<Genre> genres)
-    {
-        return genres.stream().map(Genre::getName).collect(Collectors.toUnmodifiableSet());
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     @NonNull
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String name;
+    @NonNull
+    @NotBlank
+    @Column(nullable = false)
+    private String about;
+    @OneToMany
+    private Set<@Valid Book> books = new HashSet<>();
 
-    public Genre()
+    public Author()
     {
     }
 
-    public Genre(final UUID id)
-    {
-        this.id = id;
-    }
-
-    public Genre(@NonNull @NotBlank final String name)
+    public Author(final String name, final String about)
     {
         this.name = name;
+        this.about = about;
     }
 
     public UUID getId()
@@ -63,26 +60,23 @@ public class Genre
         this.name = name;
     }
 
-    @Override
-    public boolean equals(final Object o)
+    public @NonNull String getAbout()
     {
-        if (!(o instanceof final Genre genre))
-            return false;
-        return Objects.equals(id, genre.id) && Objects.equals(name, genre.name);
+        return about;
     }
 
-    @Override
-    public int hashCode()
+    public void setAbout(@NonNull final String about)
     {
-        return Objects.hash(id, name);
+        this.about = about;
     }
 
-    @Override
-    public String toString()
+    public Set<@Valid Book> getBooks()
     {
-        return "Genre{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            '}';
+        return books;
+    }
+
+    public void setBooks(Set<@Valid Book> books)
+    {
+        this.books = books;
     }
 }

@@ -7,8 +7,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
-import one.microstream.demo.exception.InvalidGenreException;
-import one.microstream.demo.exception.MissingGenreException;
 import one.microstream.demo.repository.GenreRepository;
 
 import java.util.Set;
@@ -36,7 +34,7 @@ public class GenreController
     )
     @ApiResponse(responseCode = "400", description = "The genre already exists.")
     @Put("/{genre}")
-    public void insert(@NonNull @NotBlank @PathVariable final String genre) throws InvalidGenreException
+    public void insert(@NonNull @NotBlank @PathVariable final String genre)
     {
         this.genres.insert(genre);
     }
@@ -56,7 +54,7 @@ public class GenreController
     )
     @ApiResponse(responseCode = "404", description = "The genre could not be found.")
     @Delete("/{genre}")
-    public void delete(@NonNull @NotBlank @PathVariable final String genre) throws MissingGenreException
+    public void delete(@NonNull @NotBlank @PathVariable final String genre)
     {
         this.genres.deleteByName(genre);
     }

@@ -1,12 +1,11 @@
 package one.microstream.demo.repository;
 
 import io.micronaut.data.annotation.Repository;
-import io.micronaut.data.repository.GenericRepository;
+import io.micronaut.data.repository.CrudRepository;
 import one.microstream.demo.domain.Genre;
-import one.microstream.demo.exception.InvalidGenreException;
-import one.microstream.demo.exception.MissingGenreException;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Repository for finding and modifying genres. All methods hold a cluster-wide
@@ -14,7 +13,7 @@ import java.util.Set;
  * data received from message queues.
  */
 @Repository
-public interface GenreRepository extends GenericRepository<Genre, Long>
+public interface GenreRepository extends CrudRepository<Genre, UUID>
 {
     /**
      * Adds the specified genre to the genre set and stores the set.
@@ -31,6 +30,8 @@ public interface GenreRepository extends GenericRepository<Genre, Long>
      * @return an unmodifiable {@link Set} containing all genres
      */
     Set<String> findAllName();
+
+    Set<Genre> findAllByNameIn(Set<String> names);
 
     /**
      * Removes the specified genre from the genre set and stores the set.
