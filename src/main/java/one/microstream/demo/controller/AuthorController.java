@@ -65,7 +65,9 @@ public class AuthorController
         @NonNull @Valid @Body final UpdateAuthor update
     )
     {
-        this.authors.updateAuthorInfo(id, update.name(), update.about());
+        final var a = new Author(update.name(), update.about());
+        a.setId(id);
+        this.authors.update(a);
     }
 
     @Operation(summary = "Delete an author")

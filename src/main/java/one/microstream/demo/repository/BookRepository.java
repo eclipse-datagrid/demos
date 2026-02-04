@@ -3,9 +3,14 @@ package one.microstream.demo.repository;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.annotation.Query;
+import io.micronaut.data.annotation.QueryHint;
 import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.repository.PageableRepository;
+import io.micronaut.transaction.annotation.Transactional;
+import jakarta.persistence.EntityManager;
 import one.microstream.demo.domain.Book;
+import org.hibernate.Session;
+import org.hibernate.jpa.HibernateHints;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,13 +24,25 @@ import java.util.UUID;
  * Note: All results returned from search queries are limited to {@link BookRepository#DEFAULT_PAGE_SIZE}
  */
 @Repository
-public interface BookRepository extends PageableRepository<Book, UUID>
+public abstract class BookRepository implements PageableRepository<Book, UUID>
 {
+    private final EntityManager entityManager;
+
+    public BookRepository(final EntityManager entityManager)
+    {
+        this.entityManager = entityManager;
+    }
+
+    @QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true")
+    @Override
+    @NonNull
+    public abstract List<Book> findAll();
+
     @Join("author")
     @Join("genres")
     @Override
     @NonNull
-    Optional<Book> findById(UUID uuid);
+    public abstract Optional<Book> findById(UUID uuid);
 
     /**
      * Returns a book matching the specified ID.
@@ -34,7 +51,7 @@ public interface BookRepository extends PageableRepository<Book, UUID>
      * @return the book with matching ID
      * @throws MissingBookException if the book could not be found
      */
-    Book getById(final UUID id);
+    public abstract Book getById(final UUID id);
 
     /**
      * Returns a book matching the specified ISBN.
@@ -45,7 +62,7 @@ public interface BookRepository extends PageableRepository<Book, UUID>
      */
     @Join("genres")
     @Join("author")
-    Book getByIsbn(final String isbn);
+    public abstract Book getByIsbn(final String isbn);
 
     /**
      * Queries the ID index of the author {@link GigaMap} for the specified ID and returns a list of all books from the
@@ -57,7 +74,7 @@ public interface BookRepository extends PageableRepository<Book, UUID>
      */
     @Join("genres")
     @Join("author")
-    List<Book> searchByAuthorId(final UUID authorId);
+    public abstract List<Book> searchByAuthorId(final UUID authorId);
 
     /**
      * Queries the title index of the books {@link GigaMap} for the specified
@@ -67,9 +84,9 @@ public interface BookRepository extends PageableRepository<Book, UUID>
      * @param titleWildcardSearch the wildcard search text the title field will be searched with
      * @return a read-only list of all found books for the specified query
      */
-    List<Book> searchByTitleIlike(final String titleIlikeSearchQuery);
+    public abstract List<Book> searchByTitleIlike(final String titleIlikeSearchQuery);
 
-    void deleteAllById(Iterable<UUID> id);
+    public abstract void deleteAllById(Iterable<UUID> id);
 
     @Query(
         """
@@ -83,5 +100,11 @@ public interface BookRepository extends PageableRepository<Book, UUID>
                 WHERE b2.id = b.id AND g2.name IN :genreNames
             )"""
     )
-    List<Book> findAllWithGenres(Iterable<String> genreNames, int genreCount);
+    public abstract List<Book> findAllWithGenres(Iterable<String> genreNames, int genreCount);
+
+    @Transactional
+    public Book getByNaturalId(final String isbn)
+    {
+        return this.entityManager.unwrap(Session.class).bySimpleNaturalId(Book.class).load(isbn);
+    }
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
+import org.hibernate.annotations.NaturalId;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ public class Book
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+    @NaturalId
     @NonNull
     @NotBlank
     @Column(nullable = false, unique = true)

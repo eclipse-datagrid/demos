@@ -6,11 +6,13 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
+import one.microstream.demo.domain.Author;
 import one.microstream.demo.domain.Book;
 import one.microstream.demo.domain.Genre;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 
 /**
@@ -32,18 +34,25 @@ public record UpdateBook(
     @NonNull @NotBlank String description,
     @Positive int pages,
     @NonNull @NotEmpty Set<@NonNull @NotBlank String> genres,
-    @NonNull LocalDate publicationDate
+    @NonNull LocalDate publicationDate,
+    @NonNull UUID authorId
 )
 {
-    public Book toBook(final Function<Set<String>, Set<Genre>> genreConverter)
+    public Book toBook(
+        final UUID id,
+        final Function<Set<String>, Set<Genre>> genreConverter,
+        final Function<UUID, Author> authorConverter
+    )
     {
         final var b = new Book();
+        b.setId(id);
         b.setIsbn(isbn);
         b.setTitle(title);
         b.setDescription(description);
         b.setPages(pages);
         b.setGenres(genreConverter.apply(genres));
         b.setPublicationDate(publicationDate);
+        b.setAuthor(authorConverter.apply(authorId));
         return b;
     }
 }

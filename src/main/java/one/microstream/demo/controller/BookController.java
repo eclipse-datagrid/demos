@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import one.microstream.demo.domain.Book;
 import one.microstream.demo.dto.*;
 import one.microstream.demo.repository.AuthorRepository;
 import one.microstream.demo.repository.BookRepository;
@@ -43,6 +44,20 @@ public class BookController
         this.genres = genres;
     }
 
+    @Get("/natural/{isbn}")
+    @Transactional
+    public Book findNatural(@PathVariable final String isbn)
+    {
+        return this.books.getByNaturalId(isbn);
+    }
+
+    @Get
+    @Transactional
+    public List<GetBookById> findAll()
+    {
+        return this.books.findAll().stream().map(GetBookById::from).toList();
+    }
+
     @Operation(summary = "Insert new books")
     @RequestBody(description = "The list of books to add to the database.")
     @ApiResponse(description = "The books have been added. Returns the newly added books.")
@@ -70,8 +85,7 @@ public class BookController
     @Put("/{id}")
     public void update(@NonNull @PathVariable final UUID id, @NonNull @Valid @Body final UpdateBook update)
     {
-        final var b = update.toBook(this.genres::findAllByNameIn);
-        b.setId(id);
+        final var b = update.toBook(id, this.genres::findAllByNameIn, i -> this.authors.findById(i).get());
         this.books.update(b);
     }
 
