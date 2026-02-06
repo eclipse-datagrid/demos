@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import one.microstream.demo.domain.Book;
 import one.microstream.demo.dto.*;
 import one.microstream.demo.repository.AuthorRepository;
 import one.microstream.demo.repository.BookRepository;
@@ -46,9 +45,9 @@ public class BookController
 
     @Get("/natural/{isbn}")
     @Transactional
-    public Book findNatural(@PathVariable final String isbn)
+    public GetBookById findNatural(@PathVariable final String isbn)
     {
-        return this.books.getByNaturalId(isbn);
+        return GetBookById.from(this.books.getByNaturalId(isbn));
     }
 
     @Get

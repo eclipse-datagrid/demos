@@ -20,7 +20,7 @@
         <jdk.version>21</jdk.version>
         <release.version>21</release.version>
         <micronaut.version>4.8.3</micronaut.version>
-        <eclipsestore.version>3.1.0</eclipsestore.version>
+        <eclipsestore.version>4.0.0-SNAPSHOT</eclipsestore.version>
         <lucene.version>10.3.2</lucene.version>
         <micronaut.aot.enabled>false</micronaut.aot.enabled>
         <micronaut.runtime>netty</micronaut.runtime>
@@ -47,6 +47,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.eclipse.store</groupId>
+                <artifactId>cache-hibernate</artifactId>
+                <version>4.0.0-SNAPSHOT</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -59,6 +64,11 @@
         </dependency>
 
         <!-- Micronaut Data / Cache -->
+        <dependency>
+            <groupId>org.eclipse.datagrid</groupId>
+            <artifactId>cache-clustered</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>io.micronaut.data</groupId>
             <artifactId>micronaut-data-hibernate-jpa</artifactId>
