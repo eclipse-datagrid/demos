@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>one.microstream</groupId>
-    <artifactId>cluster-hibernate-cache-demo</artifactId>
+    <artifactId>cluster-storage-demo</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>${packaging}</packaging>
 
@@ -20,7 +20,7 @@
         <jdk.version>21</jdk.version>
         <release.version>21</release.version>
         <micronaut.version>4.8.3</micronaut.version>
-        <eclipsestore.version>4.0.0-SNAPSHOT</eclipsestore.version>
+        <eclipsestore.version>3.1.0</eclipsestore.version>
         <lucene.version>10.3.2</lucene.version>
         <micronaut.aot.enabled>false</micronaut.aot.enabled>
         <micronaut.runtime>netty</micronaut.runtime>
@@ -47,11 +47,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.eclipse.store</groupId>
-                <artifactId>cache-hibernate</artifactId>
-                <version>4.0.0-SNAPSHOT</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -63,29 +58,38 @@
             <version>2.5.3</version>
         </dependency>
 
-        <!-- Micronaut Data / Cache -->
-        <dependency>
-            <groupId>org.eclipse.datagrid</groupId>
-            <artifactId>cache-clustered-kafka</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>io.micronaut.data</groupId>
-            <artifactId>micronaut-data-hibernate-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.micronaut.sql</groupId>
-            <artifactId>micronaut-jdbc-hikari</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
+        <!-- GigaMap -->
         <dependency>
             <groupId>org.eclipse.store</groupId>
-            <artifactId>cache-hibernate</artifactId>
+            <artifactId>gigamap</artifactId>
             <version>${eclipsestore.version}</version>
+        </dependency>
+
+        <!-- Nodelibrary -->
+        <dependency>
+            <groupId>org.eclipse.datagrid</groupId>
+            <artifactId>cluster-nodelibrary-micronaut</artifactId>
+            <version>1.17.2</version>
+        </dependency>
+
+        <!-- Eclipse Store -->
+        <dependency>
+            <groupId>io.micronaut.eclipsestore</groupId>
+            <artifactId>micronaut-eclipsestore</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.eclipse.serializer</groupId>
+                    <artifactId>persistence-binary-jdk8</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.serializer</groupId>
+                    <artifactId>persistence-binary-jdk17</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.micronaut.eclipsestore</groupId>
+            <artifactId>micronaut-eclipsestore-annotations</artifactId>
         </dependency>
 
         <!-- Logging -->
@@ -199,6 +203,17 @@
                             <version>${micronaut.core.version}</version>
                         </path>
                         <path>
+                            <groupId>io.micronaut.eclipsestore</groupId>
+                            <artifactId>micronaut-eclipsestore-annotations</artifactId>
+                            <version>${micronaut.eclipsestore.version}</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>io.micronaut</groupId>
+                                    <artifactId>micronaut-inject</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </path>
+                        <path>
                             <groupId>io.micronaut.openapi</groupId>
                             <artifactId>micronaut-openapi</artifactId>
                             <version>${micronaut.openapi.version}</version>
@@ -224,17 +239,6 @@
                             <groupId>io.micronaut.validation</groupId>
                             <artifactId>micronaut-validation-processor</artifactId>
                             <version>${micronaut.validation.version}</version>
-                            <exclusions>
-                                <exclusion>
-                                    <groupId>io.micronaut</groupId>
-                                    <artifactId>micronaut-inject</artifactId>
-                                </exclusion>
-                            </exclusions>
-                        </path>
-                        <path>
-                            <groupId>io.micronaut.data</groupId>
-                            <artifactId>micronaut-data-processor</artifactId>
-                            <version>${micronaut.data.version}</version>
                             <exclusions>
                                 <exclusion>
                                     <groupId>io.micronaut</groupId>
