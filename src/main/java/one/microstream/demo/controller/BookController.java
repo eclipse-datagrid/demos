@@ -1,7 +1,14 @@
 package one.microstream.demo.controller;
 
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.core.convert.format.Format;
+import io.micronaut.data.annotation.QueryHint;
 import io.micronaut.http.annotation.*;
 import io.micronaut.transaction.annotation.Transactional;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,12 +23,7 @@ import one.microstream.demo.dto.*;
 import one.microstream.demo.repository.AuthorRepository;
 import one.microstream.demo.repository.BookRepository;
 import one.microstream.demo.repository.GenreRepository;
-
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.hibernate.jpa.HibernateHints;
 
 /**
  * {@link Controller} class for finding and modifying books.
@@ -157,10 +159,12 @@ public class BookController
         description = "The search text to search through the book titles. This uses a '*SEARCH-TEXT*' wildcard query."
     )
     @ApiResponse(description = "Returns a list of books that match the title search query.")
+    @Transactional
+    @QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true")
     @Get("/title")
-    public List<SearchBookByTitle> searchByTitle(@NonNull @NotBlank @QueryValue final String search)
+    public List<GetBookById> searchByTitle(@NonNull @NotBlank @QueryValue final String search)
     {
-        return this.books.searchByTitleIlike("%" + search + "%").stream().map(SearchBookByTitle::from).toList();
+        return this.books.searchByTitleIlike("%" + search + "%").stream().map(GetBookById::from).toList();
     }
 
     @Operation(summary = "Search for books by genre")

@@ -1,5 +1,8 @@
 package one.microstream.demo.repository;
 
+import java.util.List;
+import java.util.UUID;
+
 import io.micronaut.context.annotation.Parameter;
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.annotation.Id;
@@ -8,9 +11,7 @@ import io.micronaut.data.annotation.Repository;
 import io.micronaut.data.repository.PageableRepository;
 import jakarta.validation.constraints.NotBlank;
 import one.microstream.demo.domain.Author;
-
-import java.util.List;
-import java.util.UUID;
+import org.hibernate.jpa.HibernateHints;
 
 /**
  * Repository for finding and modifying authors. All methods hold a cluster-wide
@@ -57,5 +58,6 @@ public interface AuthorRepository extends PageableRepository<Author, UUID>
      * @param containsNameSearch the contains search text for the query
      * @return a read-only list of all authors matching the query
      */
+    @QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true")
     List<Author> searchByNameIlike(String nameIlikeQueryString);
 }

@@ -1,5 +1,9 @@
 package one.microstream.demo.repository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 import io.micronaut.core.annotation.NonNull;
 import io.micronaut.data.annotation.Join;
 import io.micronaut.data.annotation.Query;
@@ -11,10 +15,6 @@ import jakarta.persistence.EntityManager;
 import one.microstream.demo.domain.Book;
 import org.hibernate.Session;
 import org.hibernate.jpa.HibernateHints;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for finding and modifying books. All methods hold a cluster-wide read or write lock to ensure consistency
@@ -84,6 +84,7 @@ public abstract class BookRepository implements PageableRepository<Book, UUID>
      * @param titleWildcardSearch the wildcard search text the title field will be searched with
      * @return a read-only list of all found books for the specified query
      */
+    @QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true")
     public abstract List<Book> searchByTitleIlike(final String titleIlikeSearchQuery);
 
     public abstract void deleteAllById(Iterable<UUID> id);
@@ -100,6 +101,7 @@ public abstract class BookRepository implements PageableRepository<Book, UUID>
                 WHERE b2.id = b.id AND g2.name IN :genreNames
             )"""
     )
+    @QueryHint(name = HibernateHints.HINT_CACHEABLE, value = "true")
     public abstract List<Book> findAllWithGenres(Iterable<String> genreNames, int genreCount);
 
     @Transactional
