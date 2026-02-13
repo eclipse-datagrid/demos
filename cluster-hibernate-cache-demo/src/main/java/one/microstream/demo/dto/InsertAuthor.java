@@ -6,14 +6,15 @@ import io.micronaut.serde.annotation.Serdeable;
 import jakarta.validation.constraints.NotBlank;
 import one.microstream.demo.domain.Author;
 
-import java.util.UUID;
-
 @Serdeable
 @Introspected
-public record SearchAuthorByName(@NonNull UUID id, @NonNull @NotBlank String name)
+public record InsertAuthor(@NonNull @NotBlank String name, @NonNull @NotBlank String about)
 {
-    public static SearchAuthorByName from(final Author author)
+    public static Author toAuthor(final InsertAuthor insert)
     {
-        return new SearchAuthorByName(author.getId(), author.getName());
+        final var a = new Author();
+        a.setName(insert.name);
+        a.setAbout(insert.about);
+        return a;
     }
 }
