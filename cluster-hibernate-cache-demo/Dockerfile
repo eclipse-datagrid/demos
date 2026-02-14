@@ -10,5 +10,5 @@
 # Package and Run
 FROM eclipse-temurin:21
 #COPY --from=build /usr/app/target/cluster-storage-demo-*.jar ./app.jar
-ADD target/cluster-storage-demo-*.jar ./app.jar
+ADD target/cluster-hibernate-cache-demo-*.jar ./app.jar
 ENTRYPOINT ["java", "--add-exports", "java.base/jdk.internal.misc=ALL-UNNAMED", "-jar", "app.jar"]
