@@ -1,5 +1,7 @@
 package one.microstream.demo.repository;
 
+import java.util.*;
+
 import io.micronaut.eclipsestore.RootProvider;
 import jakarta.inject.Singleton;
 import one.microstream.demo.domain.Author;
@@ -7,14 +9,9 @@ import one.microstream.demo.domain.Book;
 import one.microstream.demo.domain.DataRoot;
 import one.microstream.demo.dto.*;
 import one.microstream.demo.exception.*;
-import one.microstream.demo.gigamap.GigaMapAuthorIndices;
-import one.microstream.demo.gigamap.GigaMapBookIndices;
 import org.eclipse.datagrid.cluster.nodelibrary.types.ClusterLockScope;
 import org.eclipse.serializer.concurrency.LockedExecutor;
-import org.eclipse.store.gigamap.types.GigaMap;
 import org.eclipse.store.storage.types.StorageManager;
-
-import java.util.*;
 
 /**
  * Repository for finding and modifying books. All methods hold a cluster-wide read or write lock to ensure consistency
@@ -28,8 +25,8 @@ public class BookRepository extends ClusterLockScope
 {
     private static final int DEFAULT_PAGE_SIZE = 512;
 
-    private final GigaMap<Book> books;
-    private final GigaMap<Author> authors;
+    private final List<Book> books;
+    private final List<Author> authors;
     private final Set<String> genres;
     private final StorageManager storageManager;
 
@@ -48,7 +45,7 @@ public class BookRepository extends ClusterLockScope
     }
 
     /**
-     * Adds the specified books to the books {@link GigaMap} and stores it.
+     * Adds the specified books to the books {@link List} and stores it.
      *
      * @param insert the books to add
      * @return a read-only list of the added books
@@ -73,7 +70,8 @@ public class BookRepository extends ClusterLockScope
             {
                 cachedAuthors.computeIfAbsent(
                     insertBook.authorId(),
-                    id -> this.authors.query(GigaMapAuthorIndices.ID.is(id))
+                    id -> this.authors.stream()
+                        .filter(a -> a.id().equals(id))
                         .findFirst()
                         .orElseThrow(() -> new InvalidAuthorException(id))
                 );
@@ -97,7 +95,7 @@ public class BookRepository extends ClusterLockScope
             if (!newBooks.isEmpty())
             {
                 this.books.addAll(newBooks);
-                this.books.store();
+                this.storageManager.store(this.books);
             }
 
             for (final var book : newBooks)
@@ -117,7 +115,7 @@ public class BookRepository extends ClusterLockScope
     }
 
     /**
-     * Updates the book with the specified values by replacing it and stores the books {@link GigaMap}.
+     * Updates the book with the specified values by replacing it and stores the books {@link List}.
      *
      * @param id     the ID of the book to update
      * @param update the new values for the book
@@ -127,9 +125,22 @@ public class BookRepository extends ClusterLockScope
     {
         this.write(() ->
         {
-            final Book storedBook = this.books.query(GigaMapBookIndices.ID.is(id))
-                .findFirst()
-                .orElseThrow(() -> new MissingBookException(id));
+            int index = -1;
+            for (int i = 0; i < this.books.size(); i++)
+            {
+                if (this.books.get(i).id().equals(id))
+                {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index == -1)
+            {
+                throw new MissingBookException(id);
+            }
+
+            final Book storedBook = this.books.get(index);
             final Book newBook = new Book(
                 id,
                 update.isbn(),
@@ -141,23 +152,24 @@ public class BookRepository extends ClusterLockScope
                 storedBook.author()
             );
 
-            this.books.replace(storedBook, newBook);
-            this.books.store();
+            this.books.set(index, newBook);
+            this.storageManager.store(this.books);
 
             // also update author books
-            final var authorBooks = this.authors.query(GigaMapAuthorIndices.ID.is(storedBook.author().id()))
+            final var authorBooks = this.authors.stream()
+                .filter(a -> a.id().equals(storedBook.author().id()))
                 .findFirst()
                 .get()
                 .books()
                 .get();
             authorBooks.removeIf(b -> b.id().equals(id));
             authorBooks.add(newBook);
-            storageManager.store(authorBooks);
+            this.storageManager.store(authorBooks);
         });
     }
 
     /**
-     * Removes the books with the specified IDs from the books {@link GigaMap} and stores it.
+     * Removes the books with the specified IDs from the books {@link List} and stores it.
      *
      * @param ids the IDs of the books to remove
      * @throws MissingBookException if a book with the specified ID could not be found
@@ -170,11 +182,10 @@ public class BookRepository extends ClusterLockScope
             for (final UUID id : ids)
             {
                 // ensure books exist
-                cachedBooks.add(
-                    this.books.query(GigaMapBookIndices.ID.is(id))
-                        .findFirst()
-                        .orElseThrow(() -> new MissingBookException(id))
-                );
+                cachedBooks.add(this.books.stream()
+                    .filter(b -> b.id().equals(id))
+                    .findFirst()
+                    .orElseThrow(() -> new MissingBookException(id)));
             }
             if (!cachedBooks.isEmpty())
             {
@@ -188,7 +199,7 @@ public class BookRepository extends ClusterLockScope
                     authorBooks.remove(book);
                     touchedSets.add(authorBooks);
                 }
-                this.books.store();
+                this.storageManager.store(this.books);
                 this.storageManager.storeAll(touchedSets);
             }
         });
@@ -203,12 +214,12 @@ public class BookRepository extends ClusterLockScope
      */
     public GetBookById getById(final UUID id) throws MissingBookException
     {
-        return this.read(
-                () -> this.books.query(GigaMapBookIndices.ID.is(id))
-                    .findFirst()
-                    .map(GetBookById::from)
-            )
-            .orElseThrow(() -> new MissingBookException(id));
+        return this.read(() -> this.books.stream()
+            .filter(b -> b.id().equals(id))
+            .findFirst()
+            .map(GetBookById::from)
+            .orElseThrow(() -> new MissingBookException(id))
+        );
     }
 
     /**
@@ -220,16 +231,16 @@ public class BookRepository extends ClusterLockScope
      */
     public GetBookById getByISBN(final String isbn) throws MissingBookException
     {
-        return this.read(
-                () -> this.books.query(GigaMapBookIndices.ISBN.is(isbn))
-                    .findFirst()
-                    .map(GetBookById::from)
-            )
-            .orElseThrow(() -> new MissingBookException(isbn));
+        return this.read(() -> this.books.stream()
+            .filter(b -> b.isbn().equals(isbn))
+            .findFirst()
+            .map(GetBookById::from)
+            .orElseThrow(() -> new MissingBookException(isbn))
+        );
     }
 
     /**
-     * Queries the ID index of the author {@link GigaMap} for the specified ID and returns a list of all books from the
+     * Queries the ID index of the author {@link List} for the specified ID and returns a list of all books from the
      * author.
      *
      * @param id the ID of the author
@@ -238,21 +249,21 @@ public class BookRepository extends ClusterLockScope
      */
     public List<SearchBookByAuthor> searchByAuthor(final UUID id) throws MissingAuthorException
     {
-        return this.read(
-            () -> this.authors.query(GigaMapAuthorIndices.ID.is(id))
-                .findFirst()
-                .orElseThrow(() -> new MissingAuthorException(id))
-                .books()
-                .get()
-                .stream()
-                .limit(DEFAULT_PAGE_SIZE)
-                .map(SearchBookByAuthor::from)
-                .toList()
+        return this.read(() -> this.authors.stream()
+            .filter(a -> a.id().equals(id))
+            .findFirst()
+            .orElseThrow(() -> new MissingAuthorException(id))
+            .books()
+            .get()
+            .stream()
+            .limit(DEFAULT_PAGE_SIZE)
+            .map(SearchBookByAuthor::from)
+            .toList()
         );
     }
 
     /**
-     * Queries the title index of the books {@link GigaMap} for the specified
+     * Queries the title index of the books {@link List} for the specified
      * <code>titleWildcardSearch</code> with a <code>"title:*search*"</code>
      * wildcard query.
      *
@@ -261,18 +272,16 @@ public class BookRepository extends ClusterLockScope
      */
     public List<SearchBookByTitle> searchByTitle(final String titleWildcardSearch)
     {
-        return this.read(() ->
-        {
-            final var query = this.books.query(GigaMapBookIndices.TITLE.containsIgnoreCase(titleWildcardSearch));
-            try (final var queryStream = query.stream())
-            {
-                return queryStream.map(SearchBookByTitle::from).toList();
-            }
-        });
+        final var titleWildcardSearchLowercase = titleWildcardSearch.toLowerCase(Locale.ROOT);
+        return this.read(() -> this.books.stream()
+            .filter(b -> b.title().toLowerCase(Locale.ROOT).contains(titleWildcardSearchLowercase))
+            .map(SearchBookByTitle::from)
+            .toList()
+        );
     }
 
     /**
-     * Searches the books {@link GigaMap} for the specified genres, returning every book which contains all the
+     * Searches the books {@link List} for the specified genres, returning every book which contains all the
      * specified genres.
      *
      * @param genres the genres which will be searched for
@@ -280,14 +289,10 @@ public class BookRepository extends ClusterLockScope
      */
     public List<SearchBookByGenre> searchByGenre(final Set<String> genres)
     {
-        return this.read(() ->
-        {
-            final var query = this.books.query(GigaMapBookIndices.GENRES.all(genres.toArray(String[]::new)));
-            try (final var queryStream = query.stream())
-            {
-                return queryStream.map(SearchBookByGenre::from).toList();
-            }
-        });
+        return this.read(() -> this.books.stream()
+            .filter(b -> b.genres().containsAll(genres))
+            .map(SearchBookByGenre::from)
+            .toList());
     }
 
     private void validateInsert(final List<InsertBook> insert) throws InvalidIsbnException, InvalidGenreException
@@ -296,12 +301,8 @@ public class BookRepository extends ClusterLockScope
         {
             // check for ISBN uniqueness in the insert and the storage
             final String isbn = book.isbn();
-            if (
-                insert.stream().map(InsertBook::isbn).filter(isbn::equals).count() > 1
-                    || this.books.query(GigaMapBookIndices.ISBN.is(isbn))
-                    .findFirst()
-                    .isPresent()
-            )
+            if (insert.stream().map(InsertBook::isbn).filter(isbn::equals).count() > 1
+                || this.books.stream().anyMatch(b -> b.isbn().equals(isbn)))
             {
                 throw new InvalidIsbnException(isbn);
             }
