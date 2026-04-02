@@ -6,7 +6,7 @@ distribute Hibernate update timestamps to all other running cache nodes.
 
 ## Starting the application
 
-This application requires a running Kafka server. For more information about deploying
+This application requires a running Kafka and database server. For more information about deploying
 see [the docs.](https://docs.microstream.one/enterprise/manual/1/hibernateCache/deployment.html)
 
 ## Endpoints
