@@ -1,20 +1,13 @@
-# Eclipse DataGrid Cluster Storage Demo
-Demo application featuring a bookstore demo REST-application using the EclipseStore backed [Eclipse DataGrid Micronaut Nodelibrary](https://github.com/eclipse-datagrid/datagrid).
+# Eclipse DataGrid Cluster Hibernate Cache Demo
+
+Demo application featuring a bookstore demo REST-application using the EclipseStore
+backed [Eclipse DataGrid Clustered Cache](https://github.com/eclipse-datagrid/datagrid). This app uses Kafka to
+distribute Hibernate update timestamps to all other running cache nodes.
 
 ## Starting the application
-To start the application execute the following command:
 
-```shell
-mvn mn:run
-```
-
-### Running tests
-
-To run the JUnit tests execute the following command:
-
-```shell
-mvn test
-```
+This application requires a running Kafka server. For more information about deploying
+see [the docs.](https://docs.microstream.one/enterprise/manual/1/hibernateCache/deployment.html)
 
 ## Endpoints
 To get a documented list of every endpoint the [/swagger-ui](http://localhost:8080/swagger-ui) endpoint can be called at runtime. This uses an OpenAPI definition file which is generated when the project is built. To view this file without starting the application, execute the following command:
